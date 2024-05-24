@@ -11,18 +11,18 @@ data class Page(
 
 val Pages = listOf<Page>(
 	Page(
-		title = "lorem ipsum text here",
-		desc = "lorem ipsum text is often used to provide a simulation of text blocks when true text is unavailable.",
+		title = "Catch 'em All!",
+		desc = "Find everything you'd need to know about the original 151 Pokémon. Including full colour sprites, types and locations.",
 		image = R.drawable.onboard_0
 	),
 	Page(
-		title = "lorem ipsum text here",
-		desc = "lorem ipsum text is often used to provide a simulation of text blocks when true text is unavailable.",
+		title = "Search and Select",
+		desc = "You can explore the pokemon one by one, or search for a specific pokemon by their name.",
 		image = R.drawable.onboard_1
 	),
 	Page(
-		title = "lorem ipsum text here",
-		desc = "lorem ipsum text is often used to provide a simulation of text blocks when true text is unavailable.",
+		title = "Styled like Ash's.",
+		desc = "The Pokédex uses a retro style to give the feeling of Ash's Pokédex from the manga and anime.",
 		image = R.drawable.onboard_2
 	)
 )

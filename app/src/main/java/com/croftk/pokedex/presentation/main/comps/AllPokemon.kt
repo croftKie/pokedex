@@ -11,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,31 +37,29 @@ import com.croftk.pokedex.presentation.main.data.Pokemon
 fun AllPokemon(
 	modifier: Modifier = Modifier,
 	viewState: PokedexViewModel.AllPokemonState,
-	selectedPokemon: MutableState<Pokemon?>,
+	selectedPokemonIndex: MutableState<Int>,
 	dexViewState: MutableState<String>,
-	searchValue: MutableState<String>
-	) {
+	searchValue: MutableState<String>,
+	listState: LazyListState
+) {
 
-	var filtered = viewState.list.filter {
+	val filtered = viewState.list.filter {
 		it.name.contains(searchValue.value)
 	}
 
 	LazyColumn(
-		modifier = Modifier.padding(top = 16.dp)
+		modifier = Modifier.padding(top = 16.dp),
+		horizontalAlignment = Alignment.End,
+		state = listState
 	) {
-		items(filtered){
+		itemsIndexed(filtered){ index, it ->
 			Row(
 				modifier = Modifier
-					.fillMaxWidth(0.9f)
+					.fillMaxWidth(if (selectedPokemonIndex.value == index) 0.9f else 0.7f)
 					.height(48.dp)
 					.clip(shape = RoundedCornerShape(8.dp))
-					.background(Color(it.color.toColorInt()))
-					.clickable {
-						selectedPokemon.value = it
-						dexViewState.value = "single"
-					},
+					.background(Color(it.color.toColorInt())),
 				verticalAlignment = Alignment.CenterVertically,
-
 				){
 				Image(
 					modifier = Modifier

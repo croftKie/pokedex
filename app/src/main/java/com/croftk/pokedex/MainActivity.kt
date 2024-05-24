@@ -14,6 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.croftk.pokedex.presentation.main.PokedexScreen
 import com.croftk.pokedex.presentation.onboarding.OnboardingScreen
 import com.croftk.pokedex.ui.theme.PokedexTheme
@@ -24,8 +27,16 @@ class MainActivity : ComponentActivity() {
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 		installSplashScreen()
 		setContent {
+			val navController = rememberNavController()
 			PokedexTheme {
-				PokedexScreen()
+				NavHost(navController, startDestination = "splash") {
+					composable(route = "splash") {
+						OnboardingScreen(navController = navController)
+					}
+					composable(route = "pokedex") {
+						PokedexScreen()
+					}
+				}
 			}
 		}
 	}

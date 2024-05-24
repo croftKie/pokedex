@@ -12,14 +12,18 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
+import androidx.navigation.NavController
 import com.croftk.pokedex.presentation.common.Button
 import com.croftk.pokedex.presentation.common.TextButton
 import com.croftk.pokedex.presentation.onboarding.comps.OnboardingUpper
@@ -29,7 +33,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier) {
+fun OnboardingScreen(modifier: Modifier = Modifier, navController: NavController) {
 	Column(
 		modifier = Modifier.fillMaxSize()
 	) {
@@ -74,10 +78,16 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
 						}
 					}
 				}
-				Button(text = buttonState.value[1]) {
+				Button(
+					text = buttonState.value[1],
+					colors = ButtonDefaults.buttonColors(
+						containerColor = Color("#C13333".toColorInt()),
+					),
+					) {
+					println(pagerState.currentPage)
 					scope.launch {
-						if(pagerState.currentPage == 3){
-							//nav to home
+						if(pagerState.currentPage == 2){
+							navController.navigate("pokedex")
 						} else{
 							pagerState.animateScrollToPage(page = pagerState.currentPage + 1)
 						}
@@ -89,8 +99,8 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-private fun onboardPrev() {
-	OnboardingScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun onboardPrev() {
+//	OnboardingScreen()
+//}

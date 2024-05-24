@@ -20,7 +20,6 @@ class PokedexViewModel: ViewModel() {
 		viewModelScope.launch {
 			try{
 				val res = pokemonService.getPokemon()
-				println(res)
 				_allPokemonState.value = _allPokemonState.value.copy(
 					list = res,
 					loading = false,

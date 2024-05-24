@@ -13,11 +13,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -29,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,14 +53,16 @@ import com.croftk.pokedex.presentation.main.comps.Home
 import com.croftk.pokedex.presentation.main.comps.SearchBox
 import com.croftk.pokedex.presentation.main.comps.SinglePokemon
 import com.croftk.pokedex.presentation.main.data.Pokemon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import okhttp3.internal.wait
 
 @Composable
 fun PokedexScreen(modifier: Modifier = Modifier) {
-	var dexViewState = remember {
+	val dexViewState = remember {
 		mutableStateOf("home")
 	}
-	var searchValue = remember {
+	val searchValue = remember {
 		mutableStateOf("")
 	}
 	val pokedexViewModel: PokedexViewModel = viewModel()
@@ -63,7 +70,11 @@ fun PokedexScreen(modifier: Modifier = Modifier) {
 	val selectedPokemon = remember {
 		mutableStateOf<Pokemon?>(null)
 	}
-
+	val selectedPokemonIndex = remember {
+		mutableStateOf<Int>(0)
+	}
+	val listState = rememberLazyListState()
+	val scope = rememberCoroutineScope()
 
 	Column(
 		modifier
@@ -73,6 +84,7 @@ fun PokedexScreen(modifier: Modifier = Modifier) {
 		verticalArrangement = Arrangement.SpaceBetween
 	) {
 		Image(painter = painterResource(id = R.drawable.top_pokedex), contentDescription = null)
+//		Screen for pokedex
 		Column(
 			modifier = Modifier
 				.fillMaxWidth(0.9f)
@@ -87,49 +99,53 @@ fun PokedexScreen(modifier: Modifier = Modifier) {
 				"home"-> Home()
 				"all"-> AllPokemon(
 					viewState = viewState,
-					selectedPokemon = selectedPokemon,
+					selectedPokemonIndex = selectedPokemonIndex,
 					dexViewState = dexViewState,
-					searchValue = searchValue
+					searchValue = searchValue,
+					listState = listState
 				)
 				"single"-> SinglePokemon(selectedPokemon = selectedPokemon)
 				"search"->{
 					SearchBox(searchValue = searchValue)
 					AllPokemon(
 						viewState = viewState,
-						selectedPokemon = selectedPokemon,
+						selectedPokemonIndex = selectedPokemonIndex,
 						dexViewState = dexViewState,
-						searchValue = searchValue
+						searchValue = searchValue,
+						listState = listState
 					)
 				}
 				else-> Home()
 			}
 		}
+//		controls for screen
 		Column(
 			modifier = Modifier
 				.fillMaxWidth(0.9f)
 				.fillMaxHeight(),
 			verticalArrangement = Arrangement.Center
 		) {
-			Row(
+			Column(
 				modifier = Modifier
 					.fillMaxWidth()
 					.fillMaxHeight(),
-				horizontalArrangement = Arrangement.SpaceEvenly,
-				verticalAlignment = Alignment.CenterVertically
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.SpaceEvenly
 			) {
-				Button(
-					modifier = Modifier,
-					colors = ButtonDefaults.buttonColors(
-						containerColor = Color.White,
-					),
-					text = "",
-					icon = Icons.Default.Home,
-					onClick = {
-						dexViewState.value = "home"
-					}
-				)
-				Column {
+				Row {
 					Button(
+						modifier = Modifier.padding(horizontal = 8.dp),
+						colors = ButtonDefaults.buttonColors(
+							containerColor = Color.White,
+						),
+						text = "",
+						icon = Icons.Default.Home,
+						onClick = {
+							dexViewState.value = "home"
+						}
+					)
+					Button(
+						modifier = Modifier.padding(horizontal = 8.dp),
 						colors = ButtonDefaults.buttonColors(
 							containerColor = Color("#C13333".toColorInt()),
 							contentColor = Color.White
@@ -141,6 +157,7 @@ fun PokedexScreen(modifier: Modifier = Modifier) {
 						}
 					)
 					Button(
+						modifier = Modifier.padding(horizontal = 8.dp),
 						colors = ButtonDefaults.buttonColors(
 							containerColor = Color("#335DAB".toColorInt()),
 							contentColor = Color.White
@@ -152,23 +169,75 @@ fun PokedexScreen(modifier: Modifier = Modifier) {
 						}
 					)
 				}
-				Column {
-					Button(
-						colors = ButtonDefaults.buttonColors(
-							containerColor = Color.White,
-						),
-						text = "",
-						icon = Icons.Default.KeyboardArrowUp,
-						onClick = {}
-					)
-					Button(
-						colors = ButtonDefaults.buttonColors(
-							containerColor = Color.White,
-						),
-						text = "",
-						icon = Icons.Default.KeyboardArrowDown,
-						onClick = {}
-					)
+				Row(
+					modifier.fillMaxSize()
+				) {
+					Column(
+						modifier = Modifier
+							.fillMaxWidth(0.5F)
+							.fillMaxHeight(0.75F),
+						horizontalAlignment = Alignment.CenterHorizontally,
+						verticalArrangement = Arrangement.Center
+					) {
+						Button(
+							modifier = Modifier.offset(x = 60.dp),
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color("#335DAB".toColorInt()),
+							),
+							text = "",
+							icon = Icons.Default.Check,
+							onClick = {
+								selectedPokemon.value = viewState.list[selectedPokemonIndex.value]
+								dexViewState.value = "single"
+							}
+						)
+						Button(
+							modifier = Modifier.offset(x = -30.dp),
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color("#C13333".toColorInt()),
+							),
+							text = "",
+							icon = Icons.Default.Close,
+							onClick = {
+								selectedPokemon.value = null
+								dexViewState.value = "all"
+							}
+						)
+					}
+					Column(
+						modifier = Modifier
+							.fillMaxWidth(1F)
+							.fillMaxHeight(0.75F),
+						horizontalAlignment = Alignment.CenterHorizontally,
+						verticalArrangement = Arrangement.Center
+					) {
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color.White,
+							),
+							text = "",
+							icon = Icons.Default.KeyboardArrowUp,
+							onClick = {
+								selectedPokemonIndex.value -= 1
+								scope.launch {
+									listState.scrollToItem(selectedPokemonIndex.value)
+								}
+							}
+						)
+						Button(
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color.White,
+							),
+							text = "",
+							icon = Icons.Default.KeyboardArrowDown,
+							onClick = {
+								selectedPokemonIndex.value += 1
+								scope.launch {
+									listState.animateScrollToItem(selectedPokemonIndex.value)
+								}
+							}
+						)
+					}
 				}
 			}
 		}
