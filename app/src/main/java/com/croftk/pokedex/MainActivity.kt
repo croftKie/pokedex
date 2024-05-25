@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
 		setContent {
 			val navController = rememberNavController()
 			PokedexTheme {
-				NavHost(navController, startDestination = "splash") {
+				NavHost(navController, startDestination = "pokedex") {
 					composable(route = "splash") {
 						OnboardingScreen(navController = navController)
 					}

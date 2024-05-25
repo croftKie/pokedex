@@ -8,7 +8,6 @@ data class Pokemon(
 	val imageUrl: String,
 	val types: List<String>,
 	val abilities: List<Ability>,
-//	val stats: List<Any>,
 	val locations: List<String>,
 	val color: String,
 )
